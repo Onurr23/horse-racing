@@ -13,7 +13,8 @@ export default createStore({
         horses: [],
         currentRound: 1,
         rounds: [],
-        results: []
+        results: [],
+        isRaceStarted: false
     },
     mutations: {
         SET_HORSES(state, horses) {
@@ -28,6 +29,9 @@ export default createStore({
         ADD_RACE_RESULT(state, result) {
             state.raceResults.push(result)
         },
+        SET_IS_RACE_STARTED(state, isRaceStarted) {
+            state.isRaceStarted = isRaceStarted
+        },
         RESET_ALL(state) {
             state.horses = []
             state.currentRound = 1
@@ -40,7 +44,7 @@ export default createStore({
             const horses = []
             for (let i = 0; i < 20; i++) {
                 horses.push({
-                    id: i,
+                    id: i+1,
                     name: `Horse ${i + 1}`,
                     condition: getRandomCondition(),
                     color: getRandomColor()
@@ -48,25 +52,35 @@ export default createStore({
             }
             commit('SET_HORSES', horses)
         },
-        generateRounds({ commit }) {
+        generateRounds({ state, commit }) {
             const rounds = [];
             const distances = [1200, 1400, 1600, 1800, 2000, 2200];
             const horseIds = state.horses.map(horse => horse.id);
-            const shuffled = [...horseIds].sort(() => 0.5 - Math.random())
             for (let i = 0; i < 6; i++) {
+                const shuffled = [...horseIds].sort(() => 0.5 - Math.random())
                 const round = {
-                    id: i,
+                    id: i+1,
                     distance: distances[i],
                     horses: shuffled.slice(0, 10)
                 }
                 rounds.push(round)
             }
             commit('SET_ROUNDS', rounds)
+        },
+        startStopRace({ state, commit }) {
+            const isRaceStarted = !state.isRaceStarted;
+            commit('SET_IS_RACE_STARTED', isRaceStarted)
         }
     },
-    getters:{
-        currentRace(state){
+    getters: {
+        currentRace(state) {
             return state.rounds[state.currentRound]
+        },
+        isRaceStarted(state) {
+            return state.isRaceStarted
+        },
+        getRounds(state){
+            return state.rounds
         }
     }
 })    
