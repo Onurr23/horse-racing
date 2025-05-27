@@ -2,8 +2,10 @@
 import ControlPanel from './components/ControlPanel.vue';
 import HorseList from './components/HorseList.vue';
 import RaceTrack from './components/RaceTrack.vue';
+import Program from './components/Program.vue';
 import { useStore } from 'vuex';
 import { onMounted } from 'vue'
+import Results from './components/Results.vue';
 
 const store = useStore();
 
@@ -24,7 +26,10 @@ onMounted(() => {
             <RaceTrack />
         </div>
         <div class="race-element">
-            <div></div>
+            <Program />
+        </div>
+        <div class="race-element">
+            <Results />
         </div>
     </div>
 
@@ -39,7 +44,7 @@ onMounted(() => {
 .race-element {
     flex: 1;
     background: #eee;
-    padding: 20px;
+    padding: 10px;
     text-align: center;
 }
 </style>
