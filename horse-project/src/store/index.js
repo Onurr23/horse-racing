@@ -1,12 +1,6 @@
 import { createStore } from 'vuex'
-
-function getRandomCondition() {
-    return Math.floor(Math.random() * 100) + 1 // 1–100
-}
-
-function getRandomColor() {
-    return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')
-}
+import { ADD_RACE_RESULT, SET_CURRENT_ROUND, SET_HORSES, SET_IS_RACE_FINISHED, SET_IS_RACE_STARTED, SET_ROUNDS } from '../constants/constants'
+import { getRandomColor, getRandomCondition } from '../utils/utils'
 
 export default createStore({
     state: {
@@ -55,13 +49,13 @@ export default createStore({
                     color: getRandomColor()
                 })
             }
-            commit('SET_HORSES', horses)
+            commit(SET_HORSES, horses)
         },
         generateRounds({ state, commit,dispatch }) {
             if(state.isRaceStarted)return
             if (state.isRaceFinished) {
                 commit('RESET_ALL')
-                commit('SET_IS_RACE_FINISHED', false);
+                commit(SET_IS_RACE_FINISHED, false);
                 dispatch('generateHorses')
             }
             const rounds = [];
@@ -76,18 +70,18 @@ export default createStore({
                 }
                 rounds.push(round)
             }
-            commit('SET_ROUNDS', rounds)
-            commit('SET_CURRENT_ROUND', 1)
+            commit(SET_ROUNDS, rounds)
+            commit(SET_CURRENT_ROUND, 1)
         },
         startStopRace({ state, commit }) {
             if(state.isRaceFinished)return;
             const isRaceStarted = !state.isRaceStarted;
-            commit('SET_IS_RACE_STARTED', isRaceStarted)
+            commit(SET_IS_RACE_STARTED, isRaceStarted)
         },
         addRaceResult({ state, commit }, result) {
             const results = [...state.raceResults];
             results.push(result);
-            commit('ADD_RACE_RESULT', results)
+            commit(ADD_RACE_RESULT, results)
         },
     },
     getters: {

@@ -1,8 +1,9 @@
 <script setup>
 import Horse from './Horse.vue'
 import { useStore } from 'vuex';
-import { computed, reactive, watch } from 'vue';
+import { computed, reactive, watch,onUnmounted } from 'vue';
 import { calculateSpeedPerTick } from '../utils/utils';
+import { SET_CURRENT_ROUND, SET_IS_RACE_FINISHED, SET_IS_RACE_STARTED } from '../constants/constants';
 
 const store = useStore();
 const horses = computed(() => store.state.horses)
@@ -40,21 +41,23 @@ watch([isRaceStarted, rounds, currentRound], ([isRaceStarted, rounds, currentRou
       const distance = rounds[currentRound - 1].distance;
       if (Object.values(horseInfos).some(h => h.position >= distance)) {
         clearInterval(intervalId)
-        store.commit('SET_IS_RACE_STARTED', false)
+        store.commit(SET_IS_RACE_STARTED, false)
         store.dispatch('addRaceResult', Object.values(horseInfos)?.sort((a, b) => b.position - a.position).map((result, index) => ({ ...result, position: index + 1 })))
        if(currentRound !== rounds.length){
-         store.commit('SET_CURRENT_ROUND', currentRound + 1);
+         store.commit(SET_CURRENT_ROUND, currentRound + 1);
          const timeout = setTimeout(() => {
-           store.commit('SET_IS_RACE_STARTED', true)
+           store.commit(SET_IS_RACE_STARTED, true)
            clearTimeout(timeout)
          }, 1000)
        }else{
-        store.commit('SET_IS_RACE_FINISHED', true);
+        store.commit(SET_IS_RACE_FINISHED, true);
        }
       }
     }, 50)
   }
 })
+
+onUnmounted(() => clearInterval(intervalId))
 
 </script>
 

@@ -8,4 +8,12 @@ export function calculateSpeedPerTick(condition, distance) {
   
     return finalSpeed 
   }
+
+  export function getRandomCondition() {
+    return Math.floor(Math.random() * 100) + 1 // 1–100
+}
+
+export function getRandomColor() {
+    return '#' + Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')
+}
   
