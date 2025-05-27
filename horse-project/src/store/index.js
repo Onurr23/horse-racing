@@ -74,7 +74,7 @@ export default createStore({
             commit(SET_CURRENT_ROUND, 1)
         },
         startStopRace({ state, commit }) {
-            if(state.isRaceFinished)return;
+            if(state.isRaceFinished || state.rounds.length ===0 || (state.isRaceStarted && state.rounds.length > 0))return;
             const isRaceStarted = !state.isRaceStarted;
             commit(SET_IS_RACE_STARTED, isRaceStarted)
         },
