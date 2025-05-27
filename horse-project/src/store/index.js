@@ -11,10 +11,12 @@ function getRandomColor() {
 export default createStore({
     state: {
         horses: [],
-        currentRound: 1,
+        currentRound: null,
         rounds: [],
         results: [],
-        isRaceStarted: false
+        isRaceStarted: false,
+        raceResults: [],
+        isRaceFinished: false
     },
     mutations: {
         SET_HORSES(state, horses) {
@@ -27,10 +29,13 @@ export default createStore({
             state.currentRound = round
         },
         ADD_RACE_RESULT(state, result) {
-            state.raceResults.push(result)
+            state.raceResults = result;
         },
         SET_IS_RACE_STARTED(state, isRaceStarted) {
             state.isRaceStarted = isRaceStarted
+        },
+        SET_IS_RACE_FINISHED(state, isRaceFinished) {
+            state.isRaceFinished = isRaceFinished
         },
         RESET_ALL(state) {
             state.horses = []
@@ -44,7 +49,7 @@ export default createStore({
             const horses = []
             for (let i = 0; i < 20; i++) {
                 horses.push({
-                    id: i+1,
+                    id: i + 1,
                     name: `Horse ${i + 1}`,
                     condition: getRandomCondition(),
                     color: getRandomColor()
@@ -52,25 +57,38 @@ export default createStore({
             }
             commit('SET_HORSES', horses)
         },
-        generateRounds({ state, commit }) {
+        generateRounds({ state, commit,dispatch }) {
+            if(state.isRaceStarted)return
+            if (state.isRaceFinished) {
+                commit('RESET_ALL')
+                commit('SET_IS_RACE_FINISHED', false);
+                dispatch('generateHorses')
+            }
             const rounds = [];
             const distances = [1200, 1400, 1600, 1800, 2000, 2200];
-            const horseIds = state.horses.map(horse => horse.id);
             for (let i = 0; i < 6; i++) {
-                const shuffled = [...horseIds].sort(() => 0.5 - Math.random())
+                const shuffled = [...state.horses].sort(() => 0.5 - Math.random())
                 const round = {
-                    id: i+1,
+                    id: i + 1,
                     distance: distances[i],
-                    horses: shuffled.slice(0, 10)
+                    horses: shuffled.slice(0, 10),
+                    programData: shuffled.slice(0, 10).sort((a, b) => a.id - b.id)
                 }
                 rounds.push(round)
             }
             commit('SET_ROUNDS', rounds)
+            commit('SET_CURRENT_ROUND', 1)
         },
         startStopRace({ state, commit }) {
+            if(state.isRaceFinished)return;
             const isRaceStarted = !state.isRaceStarted;
             commit('SET_IS_RACE_STARTED', isRaceStarted)
-        }
+        },
+        addRaceResult({ state, commit }, result) {
+            const results = [...state.raceResults];
+            results.push(result);
+            commit('ADD_RACE_RESULT', results)
+        },
     },
     getters: {
         currentRace(state) {
@@ -79,7 +97,7 @@ export default createStore({
         isRaceStarted(state) {
             return state.isRaceStarted
         },
-        getRounds(state){
+        getRounds(state) {
             return state.rounds
         }
     }
